@@ -88,6 +88,124 @@ The trained model provides:
 - **Performance Metrics**: Training and validation accuracy/loss curves
 - **Saved Model**: Trained model saved as `1.keras` in the models directory
 
+## FastAPI Implementation
+
+### API Overview
+The project includes a FastAPI-based REST API that allows users to upload potato leaf images and receive real-time disease classification results. The API provides a simple interface for integrating the trained CNN model into web applications, mobile apps, or other systems.
+
+### API Endpoints
+
+#### 1. Health Check Endpoint
+- **URL**: `GET /ping`
+- **Description**: Simple health check to verify the API is running
+- **Response**: 
+  ```json
+  {
+    "message": "Hello, World!"
+  }
+  ```
+
+#### 2. Image Upload and Prediction Endpoint
+- **URL**: `POST /uploadfile/`
+- **Description**: Upload a potato leaf image for disease classification
+- **Request**: Multipart form data with an image file
+- **Response**:
+  ```json
+  {
+    "class": "Potato___Early_blight",
+    "confidence": 0.95,
+    "filename": "potato_leaf.jpg"
+  }
+  ```
+
+### API Features
+
+- **Real-time Prediction**: Instant classification of uploaded images
+- **Image Preprocessing**: Automatic resizing to 256×256 pixels and normalization
+- **Confidence Scoring**: Returns prediction confidence as a percentage
+- **Error Handling**: Graceful error handling with descriptive error messages
+- **File Support**: Accepts common image formats (JPG, PNG, etc.)
+
+### Running the API
+
+1. **Navigate to the API directory**:
+   ```bash
+   cd API
+   ```
+
+2. **Start the FastAPI server**:
+   ```bash
+   python main.py
+   ```
+
+3. **Access the API**:
+   - Server runs on: `http://localhost:8000`
+   - Interactive API docs: `http://localhost:8000/docs`
+   - Alternative docs: `http://localhost:8000/redoc`
+
+### API Usage Examples
+
+#### Using cURL
+```bash
+# Health check
+curl -X GET "http://localhost:8000/ping"
+
+# Upload image for prediction
+curl -X POST "http://localhost:8000/uploadfile/" \
+     -H "accept: application/json" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@potato_leaf_image.jpg"
+```
+
+#### Using Python requests
+```python
+import requests
+
+# Health check
+response = requests.get("http://localhost:8000/ping")
+print(response.json())
+
+# Upload image for prediction
+with open("potato_leaf_image.jpg", "rb") as f:
+    files = {"file": f}
+    response = requests.post("http://localhost:8000/uploadfile/", files=files)
+    print(response.json())
+```
+
+#### Using JavaScript/Fetch
+```javascript
+// Upload image for prediction
+const formData = new FormData();
+formData.append('file', imageFile);
+
+fetch('http://localhost:8000/uploadfile/', {
+    method: 'POST',
+    body: formData
+})
+.then(response => response.json())
+.then(data => console.log(data));
+```
+
+### API Architecture
+
+The FastAPI implementation includes:
+
+1. **Image Processing Pipeline**:
+   - File upload handling
+   - Image format validation
+   - Automatic resizing to 256×256 pixels
+   - Pixel normalization (0-1 range)
+
+2. **Model Integration**:
+   - Local model loading from `models/1.keras`
+   - Batch prediction processing
+   - Class name mapping
+
+3. **Response Processing**:
+   - Confidence score calculation
+   - JSON response formatting
+   - Error handling and logging
+
 ## Installation and Setup
 
 ### Prerequisites
@@ -124,21 +242,25 @@ For faster training with GPU support, ensure you have CUDA installed and uncomme
 ## Technologies Used
 
 - **TensorFlow & Keras**: Deep learning framework
+- **FastAPI**: Modern, fast web framework for building APIs
 - **Python**: Programming language
 - **Matplotlib**: Data visualization
 - **NumPy**: Numerical computations
 - **OpenCV/PIL**: Image processing
 - **Jupyter Notebook**: Development environment
 - **Scikit-learn**: Machine learning utilities
+- **Uvicorn**: ASGI server for FastAPI
 
 ## Applications
 
-This model can be integrated into:
-- Mobile applications for farmers
-- Agricultural monitoring systems
-- Precision farming tools
-- Educational platforms for agricultural studies
-- Early warning systems for crop diseases
+This model and API can be integrated into:
+- **Web Applications**: Upload images through web interface
+- **Mobile Applications**: Smartphone apps for farmers in the field
+- **Agricultural Monitoring Systems**: Automated crop health monitoring
+- **Precision Farming Tools**: IoT devices with camera integration
+- **Educational Platforms**: Agricultural studies and training programs
+- **Early Warning Systems**: Automated crop disease detection alerts
+- **Third-party Software**: Integration via REST API endpoints
 
 ## Future Enhancements
 
